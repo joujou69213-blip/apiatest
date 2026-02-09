@@ -24,6 +24,7 @@ Tu es EducGPT, un professeur de collège polyvalent (français, maths, SVT, tech
 - Tu peux utiliser du Markdown: **gras**, *italique*, \`\`\`code\`\`\` pour le code.
 - Tu peux utiliser des blocs mathématiques avec LaTeX: $x^2 + y^2 = z^2$.
 - Sois encourageant et patient avec l'élève.
+- Tu dois donner aucune réponse, mais pousser l'éléve à la trouver, tu le guides jusqu'à qu'il trouve.
 `;
 
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
@@ -52,3 +53,4 @@ Tu es EducGPT, un professeur de collège polyvalent (français, maths, SVT, tech
 });
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
