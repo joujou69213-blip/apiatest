@@ -5,8 +5,13 @@ import cors from "cors";
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(cors()); // autorise toutes les origines (front Free-Hosting)
+app.use(cors()); // autorise toutes les origines
 app.use(express.json());
+
+// Fonction pour nettoyer la réponse des crochets et \times
+function cleanMath(text) {
+  return text.replace(/\[|\]/g, '').replace(/\\times/g, 'x');
+}
 
 // Route API pour le chat
 app.post("/api/chat", async (req, res) => {
@@ -16,7 +21,7 @@ app.post("/api/chat", async (req, res) => {
   try {
     // Prompt complet pour EducGPT
     const systemPrompt = `
-Tu es EducGPT, un professeur de collège polyvalent (français, maths, SVT, technologie, histoire…).
+Tu es EducGPT, professeur de collège (français, maths, SVT, technologie, histoire…).
 - Tu parles uniquement en français.
 - Tu réponds uniquement aux questions scolaires.
 - Tu peux refuser poliment toute question hors scolaire avec: "Je ne peux répondre qu'aux questions scolaires."
@@ -24,14 +29,14 @@ Tu es EducGPT, un professeur de collège polyvalent (français, maths, SVT, tech
 - Tu peux utiliser du Markdown: **gras**, *italique*, \`\`\`code\`\`\` pour le code.
 - Tu peux utiliser des blocs mathématiques avec LaTeX: $x^2 + y^2 = z^2$.
 - Sois encourageant et patient avec l'élève.
-- Tu dois donner aucune réponse, mais pousser l'éléve à la trouver, tu le guides jusqu'à qu'il trouve.
+- **Tu ne dois jamais donner la réponse finale.** Tu dois guider l'élève pour qu'il la trouve seul, étape par étape.
 `;
 
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}` // clé à mettre dans Render env variables
+        "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`
       },
       body: JSON.stringify({
         model: "gpt-4o-mini",
@@ -43,7 +48,11 @@ Tu es EducGPT, un professeur de collège polyvalent (français, maths, SVT, tech
     });
 
     const data = await response.json();
-    const reply = data.choices?.[0]?.message?.content || "Erreur OpenRouter";
+    let reply = data.choices?.[0]?.message?.content || "Erreur OpenRouter";
+
+    // Nettoyage des crochets et \times
+    reply = cleanMath(reply);
+
     res.json({ reply });
 
   } catch (err) {
@@ -53,4 +62,3 @@ Tu es EducGPT, un professeur de collège polyvalent (français, maths, SVT, tech
 });
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
