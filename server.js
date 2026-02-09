@@ -23,7 +23,7 @@ app.post("/api/chat", async (req, res) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": "Bearer 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" // Mets ta vraie clé
+        "Authorization": "Bearer " // Mets ta vraie clé
       },
       body: JSON.stringify({
         model: "gpt-4o-mini",
@@ -67,3 +67,4 @@ app.get("/", (req, res) => {
 });
 
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+
